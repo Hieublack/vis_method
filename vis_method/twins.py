@@ -84,6 +84,21 @@ class Twins:
 
         return file_fomula
 
+    def get_profit(self, exp):
+        data_process = self._get_data_process(np.nan_to_num(eval(exp), nan=3.1415, posinf=3.1415, neginf=3.1415))
+        id, percent = self._get_index_SS(data_process)
+        pf = []
+        for i in range(len(id)):
+            pf.append(PROFIT[id[i]] * percent[i])
+        pf = np.array(pf)
+        # pf = np.multiply(np.array(percent), PROFIT)
+        r_profit = 1
+        for i in range(len(self._index_test)-2, 0, -1):
+            id_pf_max = np.argmax(pf[self._index_test[i-1]:self._index_test[i]])+self._index_test[i-1]
+            r_profit *= PROFIT[id_pf_max]
+            # print(self.data_test['TIME'][id_pf_max],PROFIT[id_pf_max], COMPANY[id_pf_max] )
+        
+        return r_profit ** (1.0/(self._time_moment-2))
 
 
 
@@ -95,7 +110,7 @@ class Twins:
         loinhuan = []
         company = []
         value = []
-        for j in range(len(self._index_test)-1, 0, -1):
+        for j in range(len(self._index_test)-2, 0, -1):
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
             loinhuan.append(PROFIT[index_max])
             company.append(COMPANY[index_max])
@@ -415,21 +430,6 @@ class Twins:
 
 
 
-    def get_profit(self, exp):
-        data_process = self._get_data_process(np.nan_to_num(eval(exp), nan=3.1415, posinf=3.1415, neginf=3.1415))
-        id, percent = self._get_index_SS(data_process)
-        pf = []
-        for i in range(len(id)):
-            pf.append(PROFIT[id[i]] * percent[i])
-        pf = np.array(pf)
-        # pf = np.multiply(np.array(percent), PROFIT)
-        r_profit = 1
-        for i in range(len(self._index_test)-2, 0, -1):
-            id_pf_max = np.argmax(pf[self._index_test[i-1]:self._index_test[i]])+self._index_test[i-1]
-            r_profit *= PROFIT[id_pf_max]
-            # print(self.data_test['TIME'][id_pf_max],PROFIT[id_pf_max], COMPANY[id_pf_max] )
-        
-        return r_profit ** (1.0/(self._time_moment-2))
 
     
 

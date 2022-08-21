@@ -1,2 +1,2 @@
 # vis_method
-method of vis
+some code of Hieu

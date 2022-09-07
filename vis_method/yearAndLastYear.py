@@ -344,12 +344,14 @@ class YearAndLastYear:
         loinhuan = []
         company = []
         value = []
+        year = []
         for j in range(len(self._index_test)-2, 0, -1):
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
             loinhuan.append(Z[index_max])
             company.append(COMPANY[index_max])
             value.append(result_[index_max])
-        return value, loinhuan, company
+            year.append(self.data_test['TIME'][index_max])
+        return value, loinhuan, company, year
 
 
     def get_barier(self, file_ct):

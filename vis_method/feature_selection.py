@@ -37,12 +37,14 @@ def process_columns(dat):
         print('status = {}, max columns = {}'.format(status, max_value))
         raise Exception 
     else:
-        features = dat.columns[:-5]
+        features = list(dat.columns[:-5])
         data = pd.DataFrame()
         data['TIME'] = dat['Time_Investment_Number']
         data['PROFIT'] = dat['PROFIT']
         data['SYMBOL'] = dat['Symbol']
         data['EXCHANGE'] = dat['Exchange']
+        data['MARKET_CAP'] = dat['MARKET_CAP']
+        features.remove('MARKET_CAP')
         data[features] = dat[features]
-        data = data.sort_values(by=['TIME', 'SYMBOL'], ascending= [False, True])
+        data = data.sort_values(by=['TIME', 'SYMBOL'], ascending= [False, True], ignore_index=True)
         return data

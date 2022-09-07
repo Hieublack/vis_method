@@ -1,7 +1,7 @@
 import pandas as pd
 import math
 import numpy as np
-from scipy.stats.mstats import gmean
+from scipy.stats.mstats import gmean, hmean
 
 # # data = pd.read_csv('./DataYearHOSE_update03042022.csv')
 # path = ''
@@ -52,6 +52,9 @@ class Delta:
         self._flag = True
         self._dtFn = pd.DataFrame()
         self._last_result_index = []
+        self.high_rank_fomula = ['test']*100
+        self.high_rank_val = np.zeros(100)
+        self.min_rank_val = np.min(self.high_rank_val)
     
     def _update_last_time(self):
         try:
@@ -62,7 +65,7 @@ class Delta:
         except:
             pass
 
-    def create_exp_option(self, time_moment, number_ct=5000, profit_condition=1.4, type_data = 'YEAR', method = 'vetcan'):
+    def create_exp_option(self, time_moment, number_ct=5000, profit_condition=1.4, type_data = 'YEAR', method = 'vetcan', module = 'basic'):
         '''
             data:               file dữ liệu
             time_moment:        số năm muốn test
@@ -70,11 +73,17 @@ class Delta:
             profit_condition:   lợi nhuận tối thiểu công thức muốn lấy
         '''
         self._update_last_time()
+        if module == 'basic':
+            self.get_profit = self.get_profit_basic
+            self.data_full = self.data_full.sort_values(by=['TIME', 'SYMBOL'], ascending=[False, True], ignore_index=True)
+        else:
+            self.data_full = self.data_full.sort_values(by=['TIME', 'PROFIT'], ascending=[False, False], ignore_index=True)
+            self.get_profit = self.get_profit_harmean_rank
         self._time_moment = time_moment
         self._number_ct = number_ct
         self._profit_condition = profit_condition
         self._type_data = type_data
-        self.data_full = self.data_full.sort_values(by=['TIME', 'SYMBOL'], ascending=[False, True], ignore_index=True)
+
         self._index_T = self._get_index_T()
         self.data_test = self.data_full.loc()[self._index_T[-self._time_moment]:self._index_T[-1]].reset_index(drop=True)
         self._index_test = self._get_index_T(for_data= 'test')
@@ -387,7 +396,7 @@ class Delta:
         try:
             self._dtFn = pd.read_csv(f'{self.path}/f0.csv')
         except:
-            # self._n = 2
+            self._n = 2
             self._F()
 
     def _read_file(self):
@@ -625,7 +634,6 @@ class Delta:
        
         return file_barier, df_pf, df_val
 
-
     def _get_index(self):
         year = self.data_test["TIME"]
         company = self.data_test["SYMBOL"]
@@ -642,7 +650,6 @@ class Delta:
                     self._last_result_index[value[i][1]] = value[i+1][1]
         return self._last_result_index
 
-
     def _createLastResult(self, my_result):
         arr = []
         for j in range(len(self._last_result_index)):
@@ -658,7 +665,7 @@ class Delta:
                     my_result[j] = 1 
         return my_result, arr
 
-    def get_profit(self, fomula):
+    def get_profit_basic(self, fomula):
         result = np.array(eval(fomula))
         result, last_result = self._createLastResult(result)
         result_ = np.array((result-last_result)/np.absolute(result))
@@ -667,6 +674,22 @@ class Delta:
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
             loinhuan*= PROFIT[index_max]
         return loinhuan**(1.0/(self._time_moment-2))
+
+    def get_profit_harmean_rank(self, fomula):
+        result = np.array(eval(fomula))
+        result, last_result = self._createLastResult(result)
+        result_ = np.array((result-last_result)/np.absolute(result))
+        rank = []
+        for j in range(len(self._index_test)-2, 0, -1):
+            rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1
+            rank.append(1/rank_i)
+        hmean_rank = hmean(rank)
+        if hmean_rank > self.min_rank_val:
+            index_replace = np.argmin(self.high_rank_val)
+            self.high_rank_val[index_replace] = hmean_rank
+            self.high_rank_fomula[index_replace] = fomula
+            self.min_rank_val = np.min(self.high_rank_val)
+        return hmean_rank
 
     def get_value_profit_company(self, fomula):
         '''
@@ -678,7 +701,7 @@ class Delta:
         loinhuan = []
         company = []
         value = []
-        for j in range(len(self._index_test)-1, 0, -1):
+        for j in range(len(self._index_test)-2, 0, -1):
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
             loinhuan.append(PROFIT[index_max])
             company.append(COMPANY[index_max])

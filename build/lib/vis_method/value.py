@@ -664,8 +664,11 @@ class Value:
         rank = []
         # loinhuan = 1
         for j in range(len(self._index_test)-1, 0, -1):
+            if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == 0:
+                return 0
             rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1
             rank.append(1/rank_i)
+
             # loinhuan*= PROFIT[index_max]
         hmean_rank = hmean(rank)
         if hmean_rank > self.min_rank_val:

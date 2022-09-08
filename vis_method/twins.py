@@ -139,7 +139,7 @@ class Twins:
         '''
             fomula:             Công thức cần kiểm tra lợi nhuận
         '''
-        result_ =  np.nan_to_num(eval(fomula), nan=-1000000000000000000, posinf=-1000000000000000000, neginf=-1000000000000000000)
+        result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         loinhuan = []
         company = []
         value = []

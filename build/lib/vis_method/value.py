@@ -98,7 +98,7 @@ class Value:
         '''
             fomula:             Công thức cần kiểm tra lợi nhuận
         '''
-        result_ =  np.nan_to_num(eval(fomula), nan=-1000000000000000000, posinf=-1000000000000000000, neginf=-1000000000000000000)
+        result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         loinhuan = 1
         for j in range(len(self._index_test)-1, 0, -1):
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
@@ -109,7 +109,7 @@ class Value:
         '''
             fomula:             Công thức cần kiểm tra lợi nhuận
         '''
-        result_ =  np.nan_to_num(eval(fomula), nan=-1000000000000000000, posinf=-1000000000000000000, neginf=-1000000000000000000)
+        result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         loinhuan = []
         company = []
         value = []
@@ -660,7 +660,7 @@ class Value:
         return file_barier, df_pf, df_val
 
     def get_profit_harmean_rank(self, fomula):
-        result_ =  np.nan_to_num(eval(fomula), nan=-1000000000000000000, posinf=-1000000000000000000, neginf=-1000000000000000000)
+        result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         rank = []
         # loinhuan = 1
         for j in range(len(self._index_test)-1, 0, -1):
@@ -679,7 +679,7 @@ class Value:
         return hmean_rank
 
     # def get_profit_harmean_rank_print(self, fomula):
-    #     result_ =  np.nan_to_num(eval(fomula), nan=-1000000000000000000, posinf=-1000000000000000000, neginf=-1000000000000000000)
+    #     result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
     #     rank = []
     #     loinhuan = 1
     #     for j in range(len(self._index_test)-1, 0, -1):

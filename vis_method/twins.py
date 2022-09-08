@@ -120,6 +120,8 @@ class Twins:
         pf = np.multiply(np.array(percent), PROFIT)
         rank = []
         for i in range(len(self._index_test)-2, 0, -1):
+            if np.max(pf[self._index_test[i-1]:self._index_test[i]]) == 0:
+                return 0
             rank_i = np.argmax(pf[self._index_test[i-1]:self._index_test[i]]) + 1
             rank.append(1/rank_i)
             # print(self.data_test['TIME'][id_pf_max],PROFIT[id_pf_max], COMPANY[id_pf_max] )

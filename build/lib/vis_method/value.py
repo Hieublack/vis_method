@@ -50,6 +50,7 @@ class Value:
         self._type_data = 'YEAR'
         self._flag = True
         self._dtFn = pd.DataFrame()
+        self._len_data_i = []
         self.high_rank_fomula = ['test']*100
         self.high_rank_val = np.zeros(100)
         self.min_rank_val = np.min(self.high_rank_val)
@@ -81,10 +82,14 @@ class Value:
         self._number_ct = number_ct
         self._profit_condition = profit_condition
         self._type_data = type_data
-        
         self._index_T = self._get_index_T()
         self.data_test = self.data_full.loc()[self._index_T[-self._time_moment]:self._index_T[-1]].reset_index(drop=True)
         self._index_test = self._get_index_T(for_data= 'test')
+
+        self._len_data_i = []
+        for i in range(1, len(self._index_test)):
+            self._len_data_i.append(self._index_test[i]-self._index_test[i-1])
+
         self._run(method)
         if method == 'sinhF':
             self._save_file()
@@ -667,7 +672,7 @@ class Value:
             if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == 0:
                 return 0
             rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1
-            rank.append(1/rank_i)
+            rank.append(self._len_data_i[j-1]/rank_i)
 
             # loinhuan*= PROFIT[index_max]
         hmean_rank = hmean(rank)

@@ -50,6 +50,7 @@ class Twins:
         self._flag = True
         self._dtFn = pd.DataFrame()
         self._ID = []
+        self._len_data_i = []
         self.high_rank_fomula = ['test']*100
         self.high_rank_val = np.zeros(100)
         self.min_rank_val = np.min(self.high_rank_val)
@@ -85,6 +86,9 @@ class Twins:
         self._index_T = self._get_index_T()
         self.data_test = self.data_full.loc()[self._index_T[-self._time_moment]:self._index_T[-1]].reset_index(drop=True)
         self._index_test = self._get_index_T(for_data= 'test')
+        self._len_data_i = []
+        for i in range(1, len(self._index_test)):
+            self._len_data_i.append(self._index_test[i]-self._index_test[i-1])
         self._run(method)
         if method == 'sinhF':
             self._save_file()
@@ -123,7 +127,7 @@ class Twins:
             if np.max(pf[self._index_test[i-1]:self._index_test[i]]) == 0:
                 return 0
             rank_i = np.argmax(pf[self._index_test[i-1]:self._index_test[i]]) + 1
-            rank.append(1/rank_i)
+            rank.append(self._len_data_i[i-1]/rank_i)
             # print(self.data_test['TIME'][id_pf_max],PROFIT[id_pf_max], COMPANY[id_pf_max] )
         hmean_rank = hmean(rank)
         if hmean_rank > self.min_rank_val:

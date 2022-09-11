@@ -1,6 +1,7 @@
 import pandas as pd
 import math
 import numpy as np
+import heapq
 from scipy.stats.mstats import gmean, hmean
 
 # # data = pd.read_csv('./DataYearHOSE_update03042022.csv')
@@ -669,18 +670,17 @@ class Value:
         rank = []
         # loinhuan = 1
         for j in range(len(self._index_test)-1, 0, -1):
-            if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == 0:
+            if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == np.min(result_[self._index_test[j-1]:self._index_test[j]]):
                 return 0
-            rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1
+            rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1           
             rank.append(self._len_data_i[j-1]/rank_i)
-
             # loinhuan*= PROFIT[index_max]
         hmean_rank = hmean(rank)
-        if hmean_rank > self.min_rank_val:
-            index_replace = np.argmin(self.high_rank_val)
-            self.high_rank_val[index_replace] = hmean_rank
-            self.high_rank_fomula[index_replace] = fomula
-            self.min_rank_val = np.min(self.high_rank_val)
+        # if hmean_rank > self.min_rank_val:
+        #     index_replace = np.argmin(self.high_rank_val)
+        #     self.high_rank_val[index_replace] = hmean_rank
+        #     self.high_rank_fomula[index_replace] = fomula
+        #     self.min_rank_val = np.min(self.high_rank_val)
         return hmean_rank
 
     # def get_profit_harmean_rank_print(self, fomula):

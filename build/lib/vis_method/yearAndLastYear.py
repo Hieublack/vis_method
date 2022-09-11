@@ -2,6 +2,7 @@ import pandas as pd
 import math
 import numpy as np
 import os
+import heapq
 from scipy.stats.mstats import gmean, hmean
 
 
@@ -329,16 +330,16 @@ class YearAndLastYear:
         result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         rank = []
         for j in range(len(self._index_test)-2, 0, -1):
-            if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == 0:
+            if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == np.min(result_[self._index_test[j-1]:self._index_test[j]]):
                 return 0
             rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1
             rank.append(self._len_data_i[j-1]/rank_i)
         hmean_rank = hmean(rank)
-        if hmean_rank > self.min_rank_val:
-            index_replace = np.argmin(self.high_rank_val)
-            self.high_rank_val[index_replace] = hmean_rank
-            self.high_rank_fomula[index_replace] = fomula
-            self.min_rank_val = np.min(self.high_rank_val)
+        # if hmean_rank > self.min_rank_val:
+        #     index_replace = np.argmin(self.high_rank_val)
+        #     self.high_rank_val[index_replace] = hmean_rank
+        #     self.high_rank_fomula[index_replace] = fomula
+        #     self.min_rank_val = np.min(self.high_rank_val)
         return hmean_rank
 
     def get_value_profit_company(self, fomula):

@@ -1,6 +1,7 @@
 import pandas as pd
 import math
 import numpy as np
+import heapq
 from scipy.stats.mstats import gmean, hmean
 
 
@@ -124,7 +125,7 @@ class Twins:
         pf = np.multiply(np.array(percent), PROFIT)
         rank = []
         for i in range(len(self._index_test)-2, 0, -1):
-            if np.max(pf[self._index_test[i-1]:self._index_test[i]]) == 0:
+            if np.max(pf[self._index_test[i-1]:self._index_test[i]]) == np.min(pf[self._index_test[i-1]:self._index_test[i]]):
                 return 0
             rank_i = np.argmax(pf[self._index_test[i-1]:self._index_test[i]]) + 1
             rank.append(self._len_data_i[i-1]/rank_i)

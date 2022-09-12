@@ -125,7 +125,8 @@ class Twins:
         pf = np.multiply(np.array(percent), PROFIT)
         rank = []
         for i in range(len(self._index_test)-2, 0, -1):
-            if np.max(pf[self._index_test[i-1]:self._index_test[i]]) == np.min(pf[self._index_test[i-1]:self._index_test[i]]):
+            top2 = heapq.nlargest(2,pf[self._index_test[i-1]:self._index_test[i]])         #lấy top 2 giá trị lớn nhất
+            if top2[0] == top2[1] or np.max(pf[self._index_test[i-1]:self._index_test[i]]) == np.min(pf[self._index_test[i-1]:self._index_test[i]]):
                 return 0
             rank_i = np.argmax(pf[self._index_test[i-1]:self._index_test[i]]) + 1
             rank.append(self._len_data_i[i-1]/rank_i)

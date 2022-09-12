@@ -330,7 +330,8 @@ class YearAndLastYear:
         result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         rank = []
         for j in range(len(self._index_test)-2, 0, -1):
-            if np.max(result_[self._index_test[j-1]:self._index_test[j]]) == np.min(result_[self._index_test[j-1]:self._index_test[j]]):
+            top2 = heapq.nlargest(2,result_[self._index_test[j-1]:self._index_test[j]])         #lấy top 2 giá trị lớn nhất
+            if top2[0] == top2[1] or np.max(result_[self._index_test[j-1]:self._index_test[j]]) == np.min(result_[self._index_test[j-1]:self._index_test[j]]):
                 return 0
             rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1
             rank.append(self._len_data_i[j-1]/rank_i)

@@ -77,7 +77,10 @@ class Value:
             self.data_full = self.data_full.sort_values(by=['TIME', 'SYMBOL'], ascending=[False, True], ignore_index=True)
         else:
             self.data_full = self.data_full.sort_values(by=['TIME', 'PROFIT'], ascending=[False, False], ignore_index=True)
-            self.get_profit = self.get_profit_harmean_rank
+            if module == 'rank':
+                self.get_profit = self.get_profit_harmean_rank
+            else:
+                self.get_profit = self.get_profit_RankCorrelation
         self._update_last_time()
         self._time_moment = time_moment
         self._number_ct = number_ct
@@ -120,13 +123,15 @@ class Value:
         company = []
         value = []
         year = []
+        rank_index = []
         for j in range(len(self._index_test)-1, 0, -1):
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
+            rank_index.append(np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+1)
             loinhuan.append(PROFIT[index_max])
             company.append(COMPANY[index_max])
             value.append(result_[index_max])
             year.append(self.data_test['TIME'][index_max])
-        return value, loinhuan, company, year
+        return value, loinhuan, company, year, rank_index
 
     def get_variable(self):
         list_variable = [[]]*26
@@ -164,7 +169,7 @@ class Value:
             while True:
                 try:
                     self._crExp_sinh_bac()
-                    self._index_file = 0
+                    self._index_ht = 0
                     self._index_file_qk = 0
                     self._n += 1
                 except:
@@ -668,35 +673,61 @@ class Value:
     def get_profit_harmean_rank(self, fomula):
         result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
         rank = []
-        # loinhuan = 1
         for j in range(len(self._index_test)-1, 0, -1):
             top2 = heapq.nlargest(2,result_[self._index_test[j-1]:self._index_test[j]])         #lấy top 2 giá trị lớn nhất
             if top2[0] == top2[1] or np.max(result_[self._index_test[j-1]:self._index_test[j]]) == np.min(result_[self._index_test[j-1]:self._index_test[j]]):
                 return 0
             rank_i = np.argmax(result_[self._index_test[j-1]:self._index_test[j]]) + 1           
             rank.append(self._len_data_i[j-1]/rank_i)
-            # loinhuan*= PROFIT[index_max]
         hmean_rank = hmean(rank)
-        # if hmean_rank > self.min_rank_val:
-        #     index_replace = np.argmin(self.high_rank_val)
-        #     self.high_rank_val[index_replace] = hmean_rank
-        #     self.high_rank_fomula[index_replace] = fomula
-        #     self.min_rank_val = np.min(self.high_rank_val)
         return hmean_rank
 
-    # def get_profit_harmean_rank_print(self, fomula):
-    #     result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
-    #     rank = []
-    #     loinhuan = 1
-    #     for j in range(len(self._index_test)-1, 0, -1):
-    #         index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
-    #         rank_i = index_max - self._index_test[j-1] + 1
-    #         print(rank_i, self.data_test['TIME'][index_max], self._index_test[j-1])
-    #         print(result_[self._index_test[j-1]:self._index_test[j]])
-    #         rank.append(1/rank_i)
-    #         loinhuan*= PROFIT[index_max]
-    #     print(rank, fomula)
-    #     return hmean(rank)
+    def get_profit_RankCorrelation(self, fomula):
+        result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
+        rank_pro = []
+        # loinhuan = 1
+        for j in range(len(self._index_test)-1, 0, -1):
+            top2 = heapq.nlargest(2,result_[self._index_test[j-1]:self._index_test[j]])         #lấy top 2 giá trị lớn nhất
+            if top2[0] == top2[1] or np.max(result_[self._index_test[j-1]:self._index_test[j]]) == np.min(result_[self._index_test[j-1]:self._index_test[j]]):
+                return 0
+                
+            #NA_new
+            n_comp = len(result_[self._index_test[j-1]:self._index_test[j]])
+            rank_cthuc = np.arange(1, n_comp+1)
+            rank_thuc = np.argsort(-result_[self._index_test[j-1]:self._index_test[j]]) + 1
+            a_i = np.sum(self.ReLU((rank_cthuc - rank_thuc)**2))
+            result_exp = 1 - 6*a_i/(n_comp*(n_comp**2 - 1))
+            rank_pro.append(result_exp)
+        average_rank = np.average(rank_pro)
+        return average_rank
+
+    def get_value_profit_company_RankCorrelation(self, fomula):
+        '''
+            fomula:             Công thức cần kiểm tra lợi nhuận
+        '''
+        result_ =  np.nan_to_num(eval(fomula), nan=-math.inf, posinf=-math.inf, neginf=-math.inf)
+        loinhuan = []
+        company = []
+        value = []
+        year = []
+        rank_index = []
+        for j in range(len(self._index_test)-1, 0, -1):
+            index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
+            rank_index.append(np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+1)
+            loinhuan.append(PROFIT[index_max])
+            company.append(COMPANY[index_max])
+            n_comp = len(result_[self._index_test[j-1]:self._index_test[j]])
+            rank_cthuc = np.arange(1, n_comp+1)
+            rank_thuc = np.argsort(-result_[self._index_test[j-1]:self._index_test[j]]) + 1
+            a_i = np.sum(self.ReLU((rank_cthuc - rank_thuc)**2))
+            result_exp = 1 - 6*a_i/(n_comp*(n_comp**2 - 1))
+            value.append(result_exp)
+            year.append(self.data_test['TIME'][index_max])
+        return value, loinhuan, company, year, rank_index
+
+    def ReLU(self, x):
+        return x * (x > 0)
+
 
 
 

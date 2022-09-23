@@ -150,13 +150,15 @@ class Twins:
         company = []
         value = []
         year = []
+        rank_index = []
         for j in range(len(self._index_test)-2, 0, -1):
             index_max = np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+self._index_test[j-1]
+            rank_index.append(np.argmax(result_[self._index_test[j-1]:self._index_test[j]])+1)
             loinhuan.append(PROFIT[index_max])
             company.append(COMPANY[index_max])
             value.append(result_[index_max])
             year.append(self.data_test['TIME'][index_max])
-        return value, loinhuan, company, year
+        return value, loinhuan, company, year, rank_index
 
     def get_variable(self):
         list_variable = [[]]*26
@@ -194,7 +196,7 @@ class Twins:
             while True:
                 try:
                     self._crExp_sinh_bac()
-                    self._index_file = 0
+                    self._index_ht = 0
                     self._index_file_qk = 0
                     self._n += 1
                 except:

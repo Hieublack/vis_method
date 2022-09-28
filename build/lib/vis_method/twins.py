@@ -188,7 +188,7 @@ class Twins:
                     self._crExp()
                     self._index_file = 0
                     self._index_file_qk = 0
-                    self._n += 1
+                    # self._n += 1
                 except:
                     break
         elif method == 'sinhbac':
@@ -198,7 +198,7 @@ class Twins:
                     self._crExp_sinh_bac()
                     self._index_ht = 0
                     self._index_file_qk = 0
-                    self._n += 1
+                    # self._n += 1
                 except:
                     break
         elif method == 'sinhF':
@@ -360,7 +360,7 @@ class Twins:
             self._index_file += 1
             self._index_ht = 0
             self._index_qk = 0
-        
+        self._n += 1
         return "DONE"
 
     def _save_process(self):
@@ -683,7 +683,7 @@ class Twins:
             self._index_file += 1
             self._index_ht = 0
             self._index_qk = 0
-        
+        self._n += 1
         return "DONE"
  
     def _process_list_size_element(self, list_size_element):

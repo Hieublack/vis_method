@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name= "vis_method",
-    version= "2.8.8",
+    version= "2.8.10",
     author= "Hieu_black",
     author_email= "tranxuanhieuhust@gmail.com",
     description= "method of VIS",

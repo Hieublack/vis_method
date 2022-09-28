@@ -161,17 +161,18 @@ class Value:
                     self._crExp()
                     self._index_file = 0
                     self._index_file_qk = 0
-                    self._n += 1
+                    # self._n += 1
                 except:
                     break
         elif method == 'sinhbac':
             print('chạy sinh bậc')
             while True:
                 try:
+                    self._index_file = self._index_file_qk          #update 9h 26/9/2022
                     self._crExp_sinh_bac()
                     self._index_ht = 0
                     self._index_file_qk = 0
-                    self._n += 1
+                    # self._n += 1
                 except:
                     break
         elif method == 'sinhF':
@@ -333,7 +334,7 @@ class Value:
             self._index_file += 1
             self._index_ht = 0
             self._index_qk = 0
-        
+        self._n += 1
         return "DONE"
 
     def _save_process(self):
@@ -509,12 +510,9 @@ class Value:
         new_size_element = []
         for item in list_size_element:
             mod_arr = np.mod(np.array(item), 2)
-            # print('nhìn', mod_arr)
             if np.sum(mod_arr) == 0:
-                # print('check', item)
                 new_size_element.append(item)
             elif np.sum(mod_arr) == len(mod_arr)/2:
-                # print('check', item)
                 new_size_element.append(item)
         return new_size_element
 
@@ -554,7 +552,9 @@ class Value:
         print(self._n)
         list_size = self._processListSize(self._preProcessListSize(self._get_same(self._process_list_size_element(self._sizeElement([], [], self._n)))))
         list_exp_child = []
+        print(len(list_size), self._index_file_qk)
         for i in range(self._index_file_qk, len(list_size)):
+            print('check index_file', self._index_file_qk, self._index_file, len(list_size))
             list_power = []
             for key, value in list_size[i].items():
                 key = key.split('_')
@@ -575,7 +575,7 @@ class Value:
             self._index_file += 1
             self._index_ht = 0
             self._index_qk = 0
-        
+        self._n += 1
         return "DONE"
  
     def _process_list_size_element(self, list_size_element):
